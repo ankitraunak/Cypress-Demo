@@ -6,10 +6,7 @@ pipeline {
         }
     }
 
-    environment {
-        // Set environment variables if needed
-        CYPRESS_BASE_URL = 'https://www.saucedemo.com'
-    }
+
 
     stages {
         stage('Install Dependencies') {
