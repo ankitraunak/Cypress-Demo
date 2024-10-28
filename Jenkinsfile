@@ -1,54 +1,19 @@
 pipeline {
-    agent {
-        docker {
-            image 'cypress/browsers'
-            args '-u root -w //d/ProgramData/Jenkins/.jenkins/workspace/CyprssTestPipeline/' // Corrected path
-        }
-    }
-
+    agent any
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm // Checkout code from SCM
-            }
-        }
-
-        stage('Install Dependencies') {
+        stage('Build and Test') {
             steps {
                 script {
-                    echo 'Installing dependencies...'
-                    sh 'npm ci'
-                    sh 'npm install mochawesome'
+                    def workingDir = isUnix() ? "${env.WORKSPACE}" : "/c${env.WORKSPACE.substring(2).replace('\\', '/')}"
+                    docker.image('cypress/browsers').inside {
+                        dir(workingDir) {
+                            sh 'mvn clean install'
+                            sh 'npx cypress run'
+                        }
+                    }
                 }
             }
-        }
-
-        stage('Run Cypress Tests') {
-            steps {
-                script {
-                    echo 'Running Cypress tests...'
-                    sh 'npx cypress run --reporter mochawesome'
-                }
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'mochawesome-report/**/*', allowEmptyArchive: true
-                    archiveArtifacts artifacts: 'cypress/screenshots/**/*.png', allowEmptyArchive: true
-                    archiveArtifacts artifacts: 'cypress/videos/**/*.mp4', allowEmptyArchive: true
-                }
-                success {
-                    echo 'Tests passed!'
-                }
-                failure {
-                    echo 'Tests failed.'
-                }
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up...'
         }
     }
 }
+
