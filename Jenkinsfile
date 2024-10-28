@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'cypress/browsers' // Use Cypress's Docker image with browsers for testing
-            args '-u root'           // Run as root to handle potential permissions issues
+            image 'cypress/browsers'
+            args '-u root -w //d/ProgramData/Jenkins/.jenkins/workspace/CyprssTestPipeline/' // Corrected path
         }
     }
 
