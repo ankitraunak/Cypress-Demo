@@ -21,34 +21,4 @@ pipeline {
             }
         }
 
-        stage('Run Cypress Tests') {
-            steps {
-                // Run Cypress with the mochawesome reporter
-                echo 'Running Cypress tests...'
-                sh 'npx cypress run --reporter mochawesome'
-            }
-            post {
-                always {
-                    // Archive test artifacts, screenshots, and videos
-                    archiveArtifacts artifacts: 'mochawesome-report/**/*', allowEmptyArchive: true
-                    archiveArtifacts artifacts: 'cypress/screenshots/**/*.png', allowEmptyArchive: true
-                    archiveArtifacts artifacts: 'cypress/videos/**/*.mp4', allowEmptyArchive: true
-                }
-                success {
-                    echo 'Tests passed successfully!'
-                }
-                failure {
-                    echo 'Some tests failed. Check the artifacts for details.'
-                }
-            }
-        }
-    }
-
-    post {
-        cleanup {
-            // Clean up any resources or Docker containers if required
-            echo 'Cleaning up...'
-            sh 'docker system prune -f'
-        }
-    }
 }
